@@ -143,9 +143,10 @@ public enum FountainParser {
             return [ScreenplayElement(type: .action, text: text, notes: notes)]
         }
         if trimmed.hasPrefix(">") {
-            if trimmed.hasSuffix("<") {
-                let text = String(trimmed.dropFirst().dropLast()).trimmingCharacters(in: .whitespaces)
-                return [ScreenplayElement(type: .action, text: text, isCentered: true)]
+            let (stripped, notes) = extractNotes(trimmed)
+            if stripped.hasSuffix("<") {
+                let text = String(stripped.dropFirst().dropLast()).trimmingCharacters(in: .whitespaces)
+                return [ScreenplayElement(type: .action, text: text, isCentered: true, notes: notes)]
             }
             let text = String(trimmed.dropFirst()).trimmingCharacters(in: .whitespaces)
             return [ScreenplayElement(type: .transition, text: text)]
@@ -251,7 +252,7 @@ public enum FountainParser {
     static func extractNotes(_ text: String) -> (text: String, notes: [String]) {
         var notes: [String] = []
         var result = text
-        while let range = result.range(of: #"\[\[.*?\]\]"#, options: .regularExpression) {
+        while let range = result.range(of: #"(?s)\[\[.*?\]\]"#, options: .regularExpression) {
             let note = String(result[range].dropFirst(2).dropLast(2))
                 .trimmingCharacters(in: .whitespaces)
             notes.append(note)

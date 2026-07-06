@@ -155,6 +155,42 @@ struct FountainTransitionTests {
     }
 }
 
+@Suite("FountainParser — round trip regressions")
+struct FountainRoundTripRegressionTests {
+    @Test func actionResemblingTransition_withNotes_staysActionOnRoundTrip() {
+        let doc = FountainParser.parse("!CUT TO: [[fix this]]")
+        #expect(doc.elements[0].type == .action)
+        let reparsed = FountainParser.parse(PlainTextExporter.export(doc))
+        #expect(reparsed.elements[0].type == .action)
+        #expect(reparsed.elements[0].text == "CUT TO:")
+        #expect(reparsed.elements[0].notes == ["fix this"])
+    }
+
+    @Test func actionResemblingSceneHeading_withNotes_staysActionOnRoundTrip() {
+        let doc = FountainParser.parse("!INT. HOUSE - DAY [[not a heading]]")
+        let reparsed = FountainParser.parse(PlainTextExporter.export(doc))
+        #expect(reparsed.elements[0].type == .action)
+        #expect(reparsed.elements[0].text == "INT. HOUSE - DAY")
+    }
+
+    @Test func centeredAction_withNotes_keepsNotesOnRoundTrip() {
+        let doc = FountainParser.parse("> THE END < [[check placement]]")
+        #expect(doc.elements[0].isCentered)
+        #expect(doc.elements[0].notes == ["check placement"])
+        let reparsed = FountainParser.parse(PlainTextExporter.export(doc))
+        #expect(reparsed.elements[0].isCentered)
+        #expect(reparsed.elements[0].text == "THE END")
+        #expect(reparsed.elements[0].notes == ["check placement"])
+    }
+
+    @Test func multilineNote_isExtracted() {
+        let doc = FountainParser.parse("He walks away. [[fix pacing\nand tone]]")
+        #expect(doc.elements[0].type == .action)
+        #expect(doc.elements[0].text == "He walks away.")
+        #expect(doc.elements[0].notes == ["fix pacing\nand tone"])
+    }
+}
+
 @Suite("FountainParser — title page")
 struct FountainTitlePageTests {
     @Test func titlePage_keyValuePairs() {

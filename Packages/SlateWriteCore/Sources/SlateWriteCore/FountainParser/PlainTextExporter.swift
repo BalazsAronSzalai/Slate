@@ -97,18 +97,20 @@ public enum PlainTextExporter {
     }
 
     private static func renderAction(_ element: ScreenplayElement) -> String {
+        let renderedNotes = element.notes.map { "[[\($0)]]" }.joined(separator: " ")
         if element.isCentered {
-            return "> \(element.text) <"
+            var line = "> \(element.text) <"
+            if !renderedNotes.isEmpty { line += " \(renderedNotes)" }
+            return line
         }
-        var text = element.text
-        if !element.notes.isEmpty {
-            text += " " + element.notes.map { "[[\($0)]]" }.joined(separator: " ")
-        }
-        let needsForcing = FountainParser.isSceneHeading(text)
-            || text.hasPrefix(".") || text.hasPrefix("!") || text.hasPrefix("@")
-            || text.hasPrefix(">") || text.hasPrefix("~") || text.hasPrefix("#")
-            || text.hasPrefix("=")
-            || (text.hasSuffix("TO:") && text == text.uppercased())
-        return needsForcing && !text.hasPrefix("...") ? "!\(text)" : text
+        let source = element.text
+        let needsForcing = FountainParser.isSceneHeading(source)
+            || source.hasPrefix(".") || source.hasPrefix("!") || source.hasPrefix("@")
+            || source.hasPrefix(">") || source.hasPrefix("~") || source.hasPrefix("#")
+            || source.hasPrefix("=")
+            || (source.hasSuffix("TO:") && source == source.uppercased())
+        var text = needsForcing && !source.hasPrefix("...") ? "!\(source)" : source
+        if !renderedNotes.isEmpty { text += " \(renderedNotes)" }
+        return text
     }
 }

@@ -13,14 +13,15 @@ import SwiftData
 /// physically separate stores so private data can never ride along with a CKShare.
 public enum SlateModelContainer {
 
-    public static let appGroupID = "group.com.YOURTEAM.slate" // TODO: set real App Group
+    public static let appGroupID = "group.BalazsAronSzalai.slate"
+    public static let cloudKitContainerID = "iCloud.BalazsAronSzalai.slate"
 
     public static func make(inMemory: Bool = false) throws -> ModelContainer {
         let schema = Schema(versionedSchema: SlateSchemaV1.self)
 
         if inMemory {
             let config = ModelConfiguration(isStoredInMemoryOnly: true)
-            return try ModelContainer(schema: schema,
+            return try ModelContainer(for: schema,
                                       migrationPlan: SlateMigrationPlan.self,
                                       configurations: [config])
         }
@@ -29,15 +30,15 @@ public enum SlateModelContainer {
             "SlateShared",
             schema: Schema(SlateSchemaV1.sharedModels),
             groupContainer: .identifier(appGroupID),
-            cloudKitDatabase: .private("iCloud.com.YOURTEAM.slate") // TODO: container ID
+            cloudKitDatabase: .private(cloudKitContainerID)
         )
         let privateConfig = ModelConfiguration(
             "SlatePrivate",
             schema: Schema(SlateSchemaV1.privateModels),
             groupContainer: .identifier(appGroupID),
-            cloudKitDatabase: .private("iCloud.com.YOURTEAM.slate")
+            cloudKitDatabase: .private(cloudKitContainerID)
         )
-        return try ModelContainer(schema: schema,
+        return try ModelContainer(for: schema,
                                   migrationPlan: SlateMigrationPlan.self,
                                   configurations: [sharedConfig, privateConfig])
     }

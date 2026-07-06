@@ -6,6 +6,30 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin XCLocalSwiftPackageReference section */
+		4BAD51A02FFC400000F601C7 /* XCLocalSwiftPackageReference "SlateCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Slate/Packages/SlateCore;
+		};
+		4BAD51A12FFC400000F601C7 /* XCLocalSwiftPackageReference "SlateWriteCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Slate/Packages/SlateWriteCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4BAD51A22FFC400000F601C7 /* SlateCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4BAD51A02FFC400000F601C7 /* XCLocalSwiftPackageReference "SlateCore" */;
+			productName = SlateCore;
+		};
+		4BAD51A32FFC400000F601C7 /* SlateWriteCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4BAD51A12FFC400000F601C7 /* XCLocalSwiftPackageReference "SlateWriteCore" */;
+			productName = SlateWriteCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+
 /* Begin PBXContainerItemProxy section */
 		4BAD51282FFC24B300F601C7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -35,6 +59,8 @@
 			membershipExceptions = (
 				Info.plist,
 				Packages/SlateCore/Package.swift,
+				Packages/SlateCore/Sources,
+				Packages/SlateWriteCore,
 			);
 			target = 4BAD51152FFC24B200F601C7 /* Slate */;
 		};
@@ -159,6 +185,7 @@
 			);
 			name = Slate;
 			packageProductDependencies = (
+				4BAD51A22FFC400000F601C7 /* SlateCore */,
 			);
 			productName = Slate;
 			productReference = 4BAD51162FFC24B200F601C7 /* Slate.app */;
@@ -182,6 +209,7 @@
 			);
 			name = SlateTests;
 			packageProductDependencies = (
+				4BAD51A22FFC400000F601C7 /* SlateCore */,
 			);
 			productName = SlateTests;
 			productReference = 4BAD51272FFC24B300F601C7 /* SlateTests.xctest */;
@@ -242,6 +270,10 @@
 			);
 			mainGroup = 4BAD510D2FFC24B200F601C7;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4BAD51A02FFC400000F601C7 /* XCLocalSwiftPackageReference "SlateCore" */,
+				4BAD51A12FFC400000F601C7 /* XCLocalSwiftPackageReference "SlateWriteCore" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4BAD51172FFC24B200F601C7 /* Products */;
 			projectDirPath = "";

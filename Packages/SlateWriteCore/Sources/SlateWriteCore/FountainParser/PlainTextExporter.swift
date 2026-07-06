@@ -1,0 +1,128 @@
+import Foundation
+
+/// Serializes a `ScreenplayDocument` back to Fountain-compatible plain text.
+///
+/// Output is written so that re-parsing it yields an equivalent document
+/// (lossless round trip for all standard elements).
+public enum PlainTextExporter {
+    public static func export(_ document: ScreenplayDocument) -> String {
+        var chunks: [String] = []
+
+        if !document.titlePage.isEmpty {
+            var titleLines: [String] = []
+            for entry in document.titlePage {
+                if entry.value.contains("\n") {
+                    titleLines.append("\(entry.key):")
+                    for line in entry.value.components(separatedBy: "\n") {
+                        titleLines.append("    \(line)")
+                    }
+                } else {
+                    titleLines.append("\(entry.key): \(entry.value)")
+                }
+            }
+            chunks.append(titleLines.joined(separator: "\n"))
+        }
+
+        var pendingDualPartner = false
+        var index = 0
+        let elements = document.elements
+        while index < elements.count {
+            let element = elements[index]
+            switch element.type {
+            case .character:
+                var lines = [renderCharacterCue(element, pendingDualPartner: &pendingDualPartner)]
+                index += 1
+                while index < elements.count,
+                      [.dialogue, .parenthetical].contains(elements[index].type) {
+                    lines.append(elements[index].text)
+                    index += 1
+                }
+                chunks.append(lines.joined(separator: "\n"))
+                continue
+            case .sceneHeading:
+                chunks.append(renderSceneHeading(element))
+            case .action:
+                chunks.append(renderAction(element))
+            case .transition:
+                chunks.append(renderTransition(element))
+            case .lyrics:
+                chunks.append("~\(element.text)")
+            case .section:
+                chunks.append("\(String(repeating: "#", count: max(element.sectionDepth, 1))) \(element.text)")
+            case .synopsis:
+                chunks.append("= \(element.text)")
+            case .pageBreak:
+                chunks.append("===")
+            case .shot:
+                chunks.append(".\(element.text)")
+            case .dialogue, .parenthetical:
+                chunks.append(element.text) // orphaned dialogue degrades to action
+            }
+            if element.type != .character { pendingDualPartner = false }
+            index += 1
+        }
+
+        return chunks.joined(separator: "\n\n")
+    }
+
+    private static func renderCharacterCue(
+        _ element: ScreenplayElement,
+        pendingDualPartner: inout Bool
+    ) -> String {
+        var cue = element.text
+        if cue != cue.uppercased() || !FountainParser.isCharacterCue(cue) {
+            cue = "@\(cue)"
+        }
+        if element.isDualDialogue {
+            if pendingDualPartner {
+                cue += " ^"
+                pendingDualPartner = false
+            } else {
+                pendingDualPartner = true
+            }
+        } else {
+            pendingDualPartner = false
+        }
+        return cue
+    }
+
+    private static func renderSceneHeading(_ element: ScreenplayElement) -> String {
+        var line = FountainParser.isSceneHeading(element.text) ? element.text : ".\(element.text)"
+        if let sceneNumber = element.sceneNumber {
+            line += " #\(sceneNumber)#"
+        }
+        return line
+    }
+
+    private static func renderAction(_ element: ScreenplayElement) -> String {
+        let renderedNotes = element.notes.map { "[[\($0)]]" }.joined(separator: " ")
+        if element.isCentered {
+            var line = "> \(element.text) <"
+            if !renderedNotes.isEmpty { line += " \(renderedNotes)" }
+            return line
+        }
+        let source = element.text
+        let firstLine = source.components(separatedBy: "\n").first ?? source
+        let needsForcing = FountainParser.isSceneHeading(source)
+            || source.hasPrefix(".") || source.hasPrefix("!") || source.hasPrefix("@")
+            || source.hasPrefix(">") || source.hasPrefix("~") || source.hasPrefix("#")
+            || source.hasPrefix("=")
+            || (source.hasSuffix("TO:") && source == source.uppercased())
+            || (source.contains("\n") && FountainParser.isCharacterCue(firstLine))
+        var text = needsForcing && !source.hasPrefix("...") ? "!\(source)" : source
+        if !renderedNotes.isEmpty { text += " \(renderedNotes)" }
+        return text
+    }
+
+    private static func renderTransition(_ element: ScreenplayElement) -> String {
+        let renderedNotes = element.notes.map { "[[\($0)]]" }.joined(separator: " ")
+        let isStandard = element.text.hasSuffix("TO:")
+            && element.text == element.text.uppercased()
+        // A standard transition can be emitted bare, but only when it carries no
+        // notes — appending `[[…]]` would defeat the parser's standard-transition
+        // detection, so force it with `>` to keep the round trip stable.
+        var line = (isStandard && element.notes.isEmpty) ? element.text : "> \(element.text)"
+        if !renderedNotes.isEmpty { line += " \(renderedNotes)" }
+        return line
+    }
+}

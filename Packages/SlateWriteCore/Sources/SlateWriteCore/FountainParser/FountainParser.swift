@@ -25,6 +25,11 @@ public enum FountainParser {
 
     // MARK: - Title page
 
+    /// A title page is only recognized when the document opens with one of these
+    /// well-known keys. This avoids misreading body text that merely contains a
+    /// colon (e.g. `Bob turns: he sees nothing.`) as a title page. Once a title
+    /// page is detected, subsequent entries may use arbitrary keys per the
+    /// Fountain spec (e.g. `Producer: Jane Doe`).
     private static let titlePageKeys: Set<String> = [
         "title", "credit", "author", "authors", "source", "draft date",
         "date", "contact", "copyright", "notes", "revision",
@@ -43,7 +48,7 @@ public enum FountainParser {
             if line.trimmingCharacters(in: .whitespaces).isEmpty { break }
             guard let colonIndex = line.firstIndex(of: ":"),
                   !line.hasPrefix(" "), !line.hasPrefix("\t"),
-                  titlePageKeys.contains(line[..<colonIndex].lowercased())
+                  !line[..<colonIndex].trimmingCharacters(in: .whitespaces).isEmpty
             else { break }
 
             let key = String(line[..<colonIndex])

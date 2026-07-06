@@ -226,6 +226,26 @@ struct FountainTitlePageTests {
         #expect(doc.titlePage.isEmpty)
         #expect(doc.elements.count == 2)
     }
+
+    @Test func titlePage_allowsArbitraryCustomKeys() {
+        let fountain = """
+        Title: Big Fish
+        Producer: Jane Doe
+        Author: John August
+
+        INT. HOUSE - DAY
+        """
+        let doc = FountainParser.parse(fountain)
+        #expect(doc.titlePage.map(\.key) == ["Title", "Producer", "Author"])
+        #expect(doc.titlePage[1].value == "Jane Doe")
+        #expect(doc.elements.first?.type == .sceneHeading)
+    }
+
+    @Test func bodyWithLeadingColon_isNotMistakenForTitlePage() {
+        let doc = FountainParser.parse("Bob turns: he sees nothing.\n\nMore action.")
+        #expect(doc.titlePage.isEmpty)
+        #expect(doc.elements.map(\.type) == [.action, .action])
+    }
 }
 
 @Suite("FountainParser — round trip (M0 exit criterion)")

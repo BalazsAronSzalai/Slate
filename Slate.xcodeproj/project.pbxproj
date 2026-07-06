@@ -34,22 +34,56 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Packages/SlateCore/Package.swift,
 			);
 			target = 4BAD51152FFC24B200F601C7 /* Slate */;
 		};
+		4BAD51952FFC2D7A00F601C7 /* Exceptions for "SlateTests" folder in "Slate" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SlateCoreTests/EnumStabilityTests.swift,
+				SlateCoreTests/ModelContainerTests.swift,
+				SlateCoreTests/ZoneSeparationTests.swift,
+			);
+			target = 4BAD51152FFC24B200F601C7 /* Slate */;
+		};
+		4BAD51962FFC2D7A00F601C7 /* Exceptions for "SlateTests" folder in "SlateTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SlateCoreTests/EnumStabilityTests.swift,
+				SlateCoreTests/ModelContainerTests.swift,
+				SlateCoreTests/ZoneSeparationTests.swift,
+			);
+			target = 4BAD51262FFC24B300F601C7 /* SlateTests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		4BAD51862FFC2C2A00F601C7 /* Exceptions for "Slate" folder in "Copy Bundle Resources" phase from "Slate" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 4BAD51142FFC24B200F601C7 /* Resources */;
+			membershipExceptions = (
+				Packages/SlateCore/Package.swift,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		4BAD51182FFC24B200F601C7 /* Slate */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				4BAD51392FFC24B300F601C7 /* Exceptions for "Slate" folder in "Slate" target */,
+				4BAD51862FFC2C2A00F601C7 /* Exceptions for "Slate" folder in "Copy Bundle Resources" phase from "Slate" target */,
 			);
 			path = Slate;
 			sourceTree = "<group>";
 		};
 		4BAD512A2FFC24B300F601C7 /* SlateTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4BAD51952FFC2D7A00F601C7 /* Exceptions for "SlateTests" folder in "Slate" target */,
+				4BAD51962FFC2D7A00F601C7 /* Exceptions for "SlateTests" folder in "SlateTests" target */,
+			);
 			path = SlateTests;
 			sourceTree = "<group>";
 		};

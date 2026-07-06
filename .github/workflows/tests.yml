@@ -1,0 +1,16 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  slate-write-core:
+    name: SlateWriteCore unit tests
+    runs-on: ubuntu-22.04
+    container: swift:6.1.2-jammy
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        working-directory: Packages/SlateWriteCore
+        run: swift test

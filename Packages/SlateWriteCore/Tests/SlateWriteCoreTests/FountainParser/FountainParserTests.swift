@@ -189,6 +189,38 @@ struct FountainRoundTripRegressionTests {
         #expect(doc.elements[0].text == "He walks away.")
         #expect(doc.elements[0].notes == ["fix pacing\nand tone"])
     }
+
+    @Test func forcedTransition_withNotes_keepsNotesAndCleanText() {
+        let doc = FountainParser.parse("> Burn to white. [[fix pacing]]")
+        #expect(doc.elements[0].type == .transition)
+        #expect(doc.elements[0].text == "Burn to white.")
+        #expect(doc.elements[0].notes == ["fix pacing"])
+        let reparsed = FountainParser.parse(PlainTextExporter.export(doc))
+        #expect(reparsed.elements[0].type == .transition)
+        #expect(reparsed.elements[0].text == "Burn to white.")
+        #expect(reparsed.elements[0].notes == ["fix pacing"])
+    }
+
+    @Test func standardTransition_withNotes_staysTransitionOnRoundTrip() {
+        let doc = FountainParser.parse("> CUT TO: [[fix]]")
+        #expect(doc.elements[0].type == .transition)
+        #expect(doc.elements[0].text == "CUT TO:")
+        #expect(doc.elements[0].notes == ["fix"])
+        let reparsed = FountainParser.parse(PlainTextExporter.export(doc))
+        #expect(reparsed.elements[0].type == .transition)
+        #expect(reparsed.elements[0].text == "CUT TO:")
+        #expect(reparsed.elements[0].notes == ["fix"])
+    }
+
+    @Test func multilineAction_startingWithAllCapsName_staysActionOnRoundTrip() {
+        let doc = FountainParser.parse("!JOHN\nSays hello without a colon.")
+        #expect(doc.elements[0].type == .action)
+        #expect(doc.elements[0].text == "JOHN\nSays hello without a colon.")
+        let reparsed = FountainParser.parse(PlainTextExporter.export(doc))
+        #expect(reparsed.elements.count == 1)
+        #expect(reparsed.elements[0].type == .action)
+        #expect(reparsed.elements[0].text == "JOHN\nSays hello without a colon.")
+    }
 }
 
 @Suite("FountainParser — title page")

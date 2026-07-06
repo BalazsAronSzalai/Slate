@@ -44,9 +44,7 @@ public enum PlainTextExporter {
             case .action:
                 chunks.append(renderAction(element))
             case .transition:
-                let isStandard = element.text.hasSuffix("TO:")
-                    && element.text == element.text.uppercased()
-                chunks.append(isStandard ? element.text : "> \(element.text)")
+                chunks.append(renderTransition(element))
             case .lyrics:
                 chunks.append("~\(element.text)")
             case .section:
@@ -104,13 +102,27 @@ public enum PlainTextExporter {
             return line
         }
         let source = element.text
+        let firstLine = source.components(separatedBy: "\n").first ?? source
         let needsForcing = FountainParser.isSceneHeading(source)
             || source.hasPrefix(".") || source.hasPrefix("!") || source.hasPrefix("@")
             || source.hasPrefix(">") || source.hasPrefix("~") || source.hasPrefix("#")
             || source.hasPrefix("=")
             || (source.hasSuffix("TO:") && source == source.uppercased())
+            || (source.contains("\n") && FountainParser.isCharacterCue(firstLine))
         var text = needsForcing && !source.hasPrefix("...") ? "!\(source)" : source
         if !renderedNotes.isEmpty { text += " \(renderedNotes)" }
         return text
+    }
+
+    private static func renderTransition(_ element: ScreenplayElement) -> String {
+        let renderedNotes = element.notes.map { "[[\($0)]]" }.joined(separator: " ")
+        let isStandard = element.text.hasSuffix("TO:")
+            && element.text == element.text.uppercased()
+        // A standard transition can be emitted bare, but only when it carries no
+        // notes — appending `[[…]]` would defeat the parser's standard-transition
+        // detection, so force it with `>` to keep the round trip stable.
+        var line = (isStandard && element.notes.isEmpty) ? element.text : "> \(element.text)"
+        if !renderedNotes.isEmpty { line += " \(renderedNotes)" }
+        return line
     }
 }

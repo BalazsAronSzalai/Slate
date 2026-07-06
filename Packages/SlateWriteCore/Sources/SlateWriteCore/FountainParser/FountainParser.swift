@@ -153,8 +153,8 @@ public enum FountainParser {
                 let text = String(stripped.dropFirst().dropLast()).trimmingCharacters(in: .whitespaces)
                 return [ScreenplayElement(type: .action, text: text, isCentered: true, notes: notes)]
             }
-            let text = String(trimmed.dropFirst()).trimmingCharacters(in: .whitespaces)
-            return [ScreenplayElement(type: .transition, text: text)]
+            let text = String(stripped.dropFirst()).trimmingCharacters(in: .whitespaces)
+            return [ScreenplayElement(type: .transition, text: text, notes: notes)]
         }
         if trimmed.hasPrefix("."), !trimmed.hasPrefix("..") {
             let (text, sceneNumber) = extractSceneNumber(String(trimmed.dropFirst()))

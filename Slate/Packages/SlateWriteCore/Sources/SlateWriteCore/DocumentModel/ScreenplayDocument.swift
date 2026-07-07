@@ -1,5 +1,40 @@
 import Foundation
 
+/// A version snapshot of a document for autosave and manual versioning.
+public struct VersionSnapshot: Codable, Sendable, Equatable {
+    /// The snapshot name (user-provided or "Autosave" for automatic snapshots)
+    public let name: String
+    /// The document state at the time of the snapshot
+    public let document: ScreenplayDocument
+    /// When the snapshot was created
+    public let createdAt: Date
+    
+    public init(name: String, document: ScreenplayDocument, createdAt: Date = .now) {
+        self.name = name
+        self.document = document
+        self.createdAt = createdAt
+    }
+}
+
+/// A scene in a screenplay for navigation purposes.
+public struct Scene: Codable, Sendable, Equatable {
+    /// The full scene heading text
+    public let heading: String
+    /// The extracted location name (e.g., "COFFEE SHOP")
+    public let location: String
+    /// The time of day (e.g., "DAY", "NIGHT")
+    public let timeOfDay: String
+    /// The block index where this scene starts
+    public let blockIndex: Int
+    
+    public init(heading: String, location: String, timeOfDay: String, blockIndex: Int) {
+        self.heading = heading
+        self.location = location
+        self.timeOfDay = timeOfDay
+        self.blockIndex = blockIndex
+    }
+}
+
 /// In-memory screenplay document — canonical editing model for SLATE Write.
 public struct ScreenplayDocument: Codable, Sendable, Equatable {
     public var titlePage: TitlePage
